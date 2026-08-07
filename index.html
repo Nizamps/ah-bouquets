@@ -126,7 +126,9 @@
   }
   @media(max-width:600px){
     .hero{padding-top:52px;}
-    .hero-bouquet{width:min(290px, 82vw); margin:-2% auto -9%;}
+    .hero-bouquet{width:min(238px, 68vw); margin:-2% auto -7%;}
+    .hero p.lead{font-size:16px; margin:16px auto 28px; padding:0 22px 84px;}
+    .hero-cta{margin-top:-64px;}
   }
   .hero p.lead{font-size:17px; color:var(--ink-soft); max-width:480px; line-height:1.65; margin:24px auto 32px; text-align:center;}
   .hero-cta{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -167,6 +169,9 @@
     aspect-ratio:4/5; background:linear-gradient(160deg,var(--bg-alt),var(--bg)); position:relative; overflow:hidden;
   }
   .card-media img{width:100%; height:100%; object-fit:cover; display:block;}
+  .card-gallery{display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(2,1fr); width:100%; height:100%; gap:2px; background:var(--bg-alt);}
+  .card-gallery img{min-width:0; min-height:0; object-fit:cover;}
+  .card-gallery img:only-child{grid-column:1 / -1; grid-row:1 / -1;}
   .card-tag{
     position:absolute; top:14px; left:14px; background:rgba(255,255,255,0.92); padding:6px 12px;
     border-radius:999px; font-size:11px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--wine);
@@ -193,7 +198,9 @@
   .stat-row{display:flex; gap:40px; margin-top:34px; flex-wrap:wrap;}
   .stat b{display:block; font-family:'Fraunces',serif; font-size:34px; color:var(--wine);}
   .stat span{font-size:12.5px; color:var(--ink-soft); letter-spacing:.04em; text-transform:uppercase;}
-  .about-visual{display:flex; align-items:center; justify-content:center;}
+  .about-visual{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; align-items:end; justify-content:center; max-width:480px; margin:0 auto;}
+  .about-visual img{display:block; width:100%; max-height:360px; object-fit:contain; filter:drop-shadow(0 18px 22px rgba(43,33,64,0.16));}
+  .about-visual img:last-child{transform:translateY(28px) scale(.92);}
 
   /* ---------- FOOTER ---------- */
   footer{padding:70px 0 30px; background:var(--ink); color:#F3E4DA;}
@@ -351,6 +358,7 @@ let state = {
   brand: {tagline:"Fresh bouquets, made to order, delivered same day — every stem picked and tied by hand."}
 };
 let activeFilter = "all";
+let pendingImages = [];
 let isAdminOpen = false;
 let isLoginOpen = false;
 let activeAdminTab = "products";
@@ -564,7 +572,7 @@ function renderPublic(){
         <div class="card reveal in" data-tilt>
           <div class="card-media">
             <span class="card-tag">${escapeHtml(catName(p.category))}</span>
-            ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy">` : placeholderMedia(p)}
+            ${p.images?.length ? `<div class="card-gallery">${p.images.slice(0,4).map((img,i)=>`<img src="${escapeHtml(img)}" alt="${escapeHtml(p.name)} photo ${i+1}" loading="lazy">`).join("")}</div>` : p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy">` : placeholderMedia(p)}
           </div>
           <div class="card-body">
             <h3>${escapeHtml(p.name)}</h3>
@@ -594,7 +602,8 @@ function renderPublic(){
         </div>
       </div>
       <div class="about-visual reveal">
-        ${bouquetSVG("#6B4FA0", 220)}
+        <img src="lavender-bouquet-one.png" alt="Lavender and cream bouquet" loading="lazy">
+        <img src="lavender-bouquet-two.png" alt="Lavender floral arrangement" loading="lazy">
       </div>
     </div>
   </section>
@@ -673,11 +682,12 @@ function renderAdmin(){
               <div class="field">
                 <label>Photo URL <span style="font-weight:400;">(optional)</span></label>
                 <input type="text" name="image" id="imageUrlInput" placeholder="https://..." value="${editingProductId ? escapeHtml(getEditingProduct().image||'') : ''}">
-                <div class="or-divider">or upload a file</div>
+                <div class="or-divider">or upload up to 4 photos</div>
                 <div class="upload-row">
-                  <label class="upload-btn" for="imageFileInput">Choose PNG / JPG</label>
-                  <input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
+                  <label class="upload-btn" for="imageFileInput">Choose photos</label>
+                  <input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/webp" multiple style="display:none;">
                   <div class="upload-preview" id="uploadPreview" style="${editingProductId && getEditingProduct().image ? 'display:block;' : ''}"><img id="uploadPreviewImg" src="${editingProductId ? escapeHtml(getEditingProduct().image||'') : ''}"></div>
+                  <span id="uploadCount" style="font-size:12px;color:var(--ink-soft);"></span>
                 </div>
               </div>
             </div>
@@ -809,30 +819,35 @@ function bindEvents(){
 
   // Product form
   document.getElementById("imageFileInput")?.addEventListener("change", (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    if(file.size > 4.5 * 1024 * 1024){ showToast("Please use a photo under 4.5MB"); e.target.value = ""; return; }
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      const dataUrl = reader.result;
-      document.getElementById("imageUrlInput").value = dataUrl;
+    const files = [...e.target.files].slice(0,4);
+    if(!files.length) return;
+    if(files.some(file=>file.size > 4.5 * 1024 * 1024)){ showToast("Please use photos under 4.5MB"); e.target.value = ""; return; }
+    Promise.all(files.map(file=>new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=>resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }))).then(images=>{
+      pendingImages = images;
+      document.getElementById("imageUrlInput").value = images[0];
       const preview = document.getElementById("uploadPreview");
       const previewImg = document.getElementById("uploadPreviewImg");
-      previewImg.src = dataUrl;
+      previewImg.src = images[0];
       preview.style.display = "block";
-      showToast("Photo ready — save the bouquet to use it");
-    };
-    reader.onerror = ()=> showToast("Couldn't read that file, try another photo");
-    reader.readAsDataURL(file);
+      document.getElementById("uploadCount").textContent = images.length + " photo" + (images.length === 1 ? "" : "s") + " selected";
+      showToast("Photos ready — save the bouquet to use them");
+    }).catch(()=>showToast("Couldn't read those photos, try again"));
   });
   document.getElementById("productForm")?.addEventListener("submit", (e)=>{
     e.preventDefault();
     const f = e.target;
+    const selectedImages = pendingImages.length ? pendingImages : (editingProductId ? (getEditingProduct().images || (f.image.value.trim() ? [f.image.value.trim()] : [])) : (f.image.value.trim() ? [f.image.value.trim()] : []));
     const data = {
       name: f.name.value.trim(),
       price: Number(f.price.value),
       category: f.category.value,
-      image: f.image.value.trim(),
+      image: selectedImages[0] || "",
+      images: selectedImages,
       desc: f.desc.value.trim()
     };
     if(!data.name || !data.price){ showToast("Add a name and price first"); return; }
@@ -840,9 +855,10 @@ function bindEvents(){
       const idx = state.products.findIndex(p=>p.id===editingProductId);
       state.products[idx] = {...state.products[idx], ...data};
       showToast("Bouquet updated");
-      editingProductId = null;
+      editingProductId = null; pendingImages = [];
     }else{
       state.products.push({id:uid("p"), ...data});
+      pendingImages = [];
       showToast("Bouquet added");
     }
     saveState(); render();
