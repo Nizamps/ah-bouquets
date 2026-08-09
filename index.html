@@ -581,6 +581,7 @@
   html.dark .upload-btn{color:var(--ink-soft);}
   html.dark .admin-link{color:#B8AEC5;}
 
+  /* ---------- THEME TOGGLE ---------- */
   .theme-toggle{
     width:38px; height:38px; flex:none; border-radius:50%;
     border:1px solid var(--line); background:var(--glass-bg);
@@ -594,10 +595,30 @@
   html.dark .theme-toggle .moon-icon{display:none;}
   html.dark .theme-toggle .sun-icon{display:block;}
   .theme-toggle-label{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+
+  /* Theme control inside the hamburger menu on mobile */
+  .mobile-theme-item{
+    display:none; align-items:center; justify-content:space-between;
+    width:100%; padding:12px 0 8px; margin-top:6px;
+    border-top:1px solid var(--line);
+    color:var(--ink); font-size:14px; font-weight:500;
+  }
+  .mobile-theme-copy{display:flex; align-items:center; gap:10px;}
+  .mobile-theme-item .theme-toggle{width:36px; height:36px; background:var(--bg-alt);}
+  .mobile-theme-item .theme-toggle svg{width:17px; height:17px;}
+
+  /* Desktop theme control lives in the footer, not the header */
+  .footer-theme{display:inline-flex; align-items:center; gap:10px;}
+  .footer-theme-label{font-size:12.5px; color:var(--footer-muted);}
+  .footer-theme .theme-toggle{width:34px; height:34px; background:transparent; color:var(--footer-text); border-color:var(--footer-border);}
+  .footer-theme .theme-toggle:hover{background:rgba(255,255,255,.08);}
+
+  @media(max-width:760px){
+    .mobile-theme-item{display:flex;}
+    .footer-theme{display:none;}
+  }
   @media(max-width:420px){
     .nav-right{gap:7px;}
-    .theme-toggle{width:36px;height:36px;}
-    .theme-toggle svg{width:17px;height:17px;}
     .nav-right .btn-sm{padding:8px 10px; font-size:10.5px;}
     .menu-toggle{width:36px;height:36px;}
   }
@@ -840,19 +861,17 @@ function renderPublic(){
         <a href="#shop">Shop</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
+        <div class="mobile-theme-item">
+          <span class="mobile-theme-copy"><span aria-hidden="true">◐</span><span class="mobile-theme-text">Dark mode</span></span>
+          <button class="theme-toggle" id="themeToggleMobile" type="button" aria-label="Switch to dark mode" title="Switch theme">
+            <span class="theme-toggle-label">Switch theme</span>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/></svg>
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+          </button>
+        </div>
       </div>
       <div class="nav-right">
         <a class="btn btn-wine btn-sm" href="${waLink("Hi AH! I'd like to place an order.")}" target="_blank" rel="noopener">Order on WhatsApp</a>
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Switch theme">
-          <span class="theme-toggle-label">Switch theme</span>
-          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/>
-          </svg>
-          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
-          </svg>
-        </button>
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
@@ -978,6 +997,14 @@ function renderPublic(){
       </div>
       <div class="bottom-bar">
         <span>© ${new Date().getFullYear()} AH. All bouquets made to order.</span>
+        <div class="footer-theme">
+          <span class="footer-theme-label">Theme</span>
+          <button class="theme-toggle" id="themeToggleFooter" type="button" aria-label="Switch to dark mode" title="Switch theme">
+            <span class="theme-toggle-label">Switch theme</span>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/></svg>
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l-1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+          </button>
+        </div>
         <button class="admin-link" id="openAdminBtn">Admin</button>
       </div>
     </div>
@@ -1272,8 +1299,10 @@ function applyTheme(dark){
   document.documentElement.classList.toggle("dark", dark);
   try{ localStorage.setItem("ah-theme", dark ? "dark" : "light"); }catch(e){}
   const label = dark ? "Switch to light mode" : "Switch to dark mode";
-  document.getElementById("themeToggle")?.setAttribute("aria-label", label);
-  document.getElementById("themeToggle")?.setAttribute("title", label);
+  document.getElementById("themeToggleMobile")?.setAttribute("aria-label", label);
+  document.getElementById("themeToggleMobile")?.setAttribute("title", label);
+  document.getElementById("themeToggleFooter")?.setAttribute("aria-label", label);
+  document.getElementById("themeToggleFooter")?.setAttribute("title", label);
   const adminLabel = document.querySelector(".theme-admin-label");
   if(adminLabel) adminLabel.textContent = dark ? "Light mode" : "Dark mode";
 }
@@ -1284,7 +1313,8 @@ function toggleTheme(){
 /* ========================= EVENTS ========================= */
 function bindEvents(){
   // Theme toggle
-  document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
+  document.getElementById("themeToggleMobile")?.addEventListener("click", toggleTheme);
+  document.getElementById("themeToggleFooter")?.addEventListener("click", toggleTheme);
   document.getElementById("themeToggleAdmin")?.addEventListener("click", toggleTheme);
   applyTheme(document.documentElement.classList.contains("dark"));
 
@@ -1294,6 +1324,9 @@ function bindEvents(){
   });
   document.querySelectorAll("#navLinks a").forEach(a=>{
     a.addEventListener("click", ()=> document.getElementById("navLinks")?.classList.remove("open"));
+  });
+  document.getElementById("themeToggleMobile")?.addEventListener("click", ()=>{
+    document.getElementById("navLinks")?.classList.remove("open");
   });
 
   // Category chips
