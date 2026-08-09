@@ -499,7 +499,109 @@
   }
   .upload-thumb-remove:hover{background:var(--wine);}
   .or-divider{font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin:10px 0 6px;}
+
+  /* ---------- DARK MODE ---------- */
+  html.dark{
+    color-scheme:dark;
+  }
+  html.dark :root{}
+  html.dark{
+    --bg:#15131A;
+    --bg-alt:#241F2D;
+    --ink:#F5F1FA;
+    --ink-soft:#B8AEC5;
+    --wine:#A88BDB;
+    --wine-dark:#8D6FC4;
+    --rose:#4A3B5F;
+    --sage:#9EAE8F;
+    --sage-dark:#82936F;
+    --card:#211E27;
+    --line:rgba(245,241,250,0.14);
+    --shadow:0 20px 50px -20px rgba(0,0,0,0.65);
+    --glass-bg:rgba(35,31,43,0.68);
+    --glass-bg-soft:rgba(35,31,43,0.52);
+    --glass-border:1px solid rgba(255,255,255,0.12);
+    --glass-shadow:0 30px 60px -20px rgba(0,0,0,0.55);
+  }
+  html.dark body{background:var(--bg); color:var(--ink);}
+  html.dark .hero{background:radial-gradient(circle at 50% 0%, var(--bg-alt), var(--bg) 62%);}
+  html.dark .about{background:var(--bg-alt);}
+  html.dark .strip{background:#6E56A0;}
+  html.dark .btn-outline{border-color:var(--ink); color:var(--ink);}
+  html.dark .btn-outline:hover{background:var(--ink); color:#15131A;}
+  html.dark .card-media{background:linear-gradient(160deg,var(--bg-alt),var(--bg));}
+  html.dark .card-tag{background:rgba(34,30,42,0.92); color:var(--wine);}
+  html.dark .field input,
+  html.dark .field select,
+  html.dark .field textarea,
+  html.dark .icon-btn,
+  html.dark .cat-pill,
+  html.dark .upload-btn,
+  html.dark .admin-tab{
+    background:#2A2632;
+    color:var(--ink);
+    border-color:var(--line);
+  }
+  html.dark .field input::placeholder,
+  html.dark .field textarea::placeholder{color:#8F879B;}
+  html.dark .icon-btn:hover,
+  html.dark .upload-btn:hover{background:var(--bg-alt);}
+  html.dark .modal{background:var(--card); color:var(--ink);}
+  html.dark .modal-overlay{background:rgba(0,0,0,0.68);}
+  html.dark .order-sheet,
+  html.dark .order-card,
+  html.dark .order-sticky-head,
+  html.dark .order-thumbs{background:var(--card);}
+  html.dark .order-gallery,
+  html.dark .order-gallery-slide img,
+  html.dark .order-thumb,
+  html.dark .table-thumb,
+  html.dark .upload-preview,
+  html.dark .upload-thumb{background:var(--bg-alt);}
+  html.dark .lightbox-img{background:#18151E;}
+  html.dark .lightbox-nav{background:rgba(40,36,48,0.88); color:var(--ink);}
+  html.dark .lightbox-nav:hover{background:#332E3C;}
+  html.dark .menu-toggle:hover{background:var(--bg-alt);}
+  html.dark .admin-nav-item:hover{background:var(--bg-alt);}
+  html.dark .admin-nav-logout{color:var(--wine);}
+  html.dark .admin-screen{background:var(--bg);}
+  html.dark .admin-sidebar{background:var(--glass-bg);}
+  html.dark .admin-brand-title,
+  html.dark .admin-page-head h2{color:var(--ink);}
+  html.dark .cat-pill button{color:var(--wine);}
+  html.dark .admin-tab{color:var(--ink-soft);}
+  html.dark .upload-btn{color:var(--ink-soft);}
+  html.dark .admin-link{color:#B8AEC5;}
+
+  .theme-toggle{
+    width:38px; height:38px; flex:none; border-radius:50%;
+    border:1px solid var(--line); background:var(--glass-bg);
+    color:var(--ink); display:inline-flex; align-items:center; justify-content:center;
+    transition:transform .2s ease, background .2s ease, border-color .2s ease;
+    backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  }
+  .theme-toggle:hover{transform:translateY(-1px); background:var(--bg-alt);}
+  .theme-toggle svg{width:18px; height:18px;}
+  .theme-toggle .sun-icon{display:none;}
+  html.dark .theme-toggle .moon-icon{display:none;}
+  html.dark .theme-toggle .sun-icon{display:block;}
+  .theme-toggle-label{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+  @media(max-width:420px){
+    .theme-toggle{width:34px;height:34px;}
+    .nav-right{gap:8px;}
+  }
+
 </style>
+
+<script>
+  (function(){
+    try{
+      const saved = localStorage.getItem("ah-theme");
+      const dark = saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.classList.toggle("dark", dark);
+    }catch(e){}
+  })();
+</script>
 </head>
 <body>
 
@@ -729,6 +831,16 @@ function renderPublic(){
         <a href="#contact">Contact</a>
       </div>
       <div class="nav-right">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Switch theme">
+          <span class="theme-toggle-label">Switch theme</span>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/>
+          </svg>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+          </svg>
+        </button>
         <a class="btn btn-wine btn-sm" href="${waLink("Hi AH! I'd like to place an order.")}" target="_blank" rel="noopener">Order on WhatsApp</a>
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -884,6 +996,9 @@ function renderAdmin(){
           </button>
         </nav>
         <div class="admin-nav-spacer"></div>
+        <button class="admin-nav-item" id="themeToggleAdmin" type="button">
+          <span class="admin-nav-icon">◐</span> <span class="theme-admin-label">Dark mode</span>
+        </button>
         <button class="admin-nav-item" id="closeAdminBtn">
           <span class="admin-nav-icon">↗</span> View live site
         </button>
@@ -1141,8 +1256,27 @@ function render(){
   initTilt();
 }
 
+/* ========================= THEME ========================= */
+function applyTheme(dark){
+  document.documentElement.classList.toggle("dark", dark);
+  try{ localStorage.setItem("ah-theme", dark ? "dark" : "light"); }catch(e){}
+  const label = dark ? "Switch to light mode" : "Switch to dark mode";
+  document.getElementById("themeToggle")?.setAttribute("aria-label", label);
+  document.getElementById("themeToggle")?.setAttribute("title", label);
+  const adminLabel = document.querySelector(".theme-admin-label");
+  if(adminLabel) adminLabel.textContent = dark ? "Light mode" : "Dark mode";
+}
+function toggleTheme(){
+  applyTheme(!document.documentElement.classList.contains("dark"));
+}
+
 /* ========================= EVENTS ========================= */
 function bindEvents(){
+  // Theme toggle
+  document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
+  document.getElementById("themeToggleAdmin")?.addEventListener("click", toggleTheme);
+  applyTheme(document.documentElement.classList.contains("dark"));
+
   // Mobile menu toggle
   document.getElementById("menuToggle")?.addEventListener("click", ()=>{
     document.getElementById("navLinks")?.classList.toggle("open");
